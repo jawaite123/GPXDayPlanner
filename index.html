@@ -327,7 +327,7 @@ function buildTabs(){
   for(let d=0;d<TRIP.numDays;d++){
     const b=document.createElement('button');
     b.className='tab'+(d===activeDay?' active':'');
-    b.innerHTML='Day '+(d+1)+'<span class="lbl">'+(tabDate(d)?tabDate(d)+' · ':'')+Math.round(dayMiles(d))+' mi</span>';
+    b.innerHTML='Day '+(d+1)+(tabDate(d)?'<span class="lbl">'+tabDate(d)+'</span>':'');
     b.onclick=()=>{activeDay=d;render();};
     t.appendChild(b);
   }
