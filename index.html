@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RV Loop — Day Timing</title>
+<style>
+  :root{
+    --asphalt:#1c1d22; --asphalt2:#26282f; --cream:#f3ead6; --paper:#fbf6ea;
+    --route:#d8482b; --route-dk:#a8331c; --sign:#1f6f43; --sign-lt:#2e9460;
+    --amber:#f0b24a; --line:#3a3d46; --ink:#2a2a2a; --muted:#b3b8c4;
+    --shadow:0 2px 0 rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--asphalt);color:var(--cream);
+    font-family:'Courier New',ui-monospace,monospace;line-height:1.4;padding-bottom:60px;
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 78px,rgba(255,255,255,.015) 78px,rgba(255,255,255,.015) 80px);
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 16px}
+  header{padding:30px 16px 18px;text-align:center}
+  .eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+  h1{font-family:Georgia,'Times New Roman',serif;font-weight:800;font-size:clamp(28px,7vw,46px);
+    color:var(--cream);letter-spacing:-.5px;line-height:1.05;text-shadow:2px 2px 0 var(--route-dk)}
+  .sub{color:var(--muted);font-size:13px;margin-top:8px;letter-spacing:.04em}
+  #tripname{font-size:12px;color:var(--sign-lt);margin-top:6px;letter-spacing:.08em}
+
+  .controls{background:var(--asphalt2);border:1px solid var(--line);border-radius:10px;
+    padding:16px;margin:18px 0 8px;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;box-shadow:var(--shadow)}
+  .ctrl{display:flex;flex-direction:column;gap:5px}
+  .ctrl label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .ctrl input{background:var(--asphalt);border:1px solid var(--line);color:var(--cream);
+    font-family:inherit;font-size:16px;padding:8px 10px;border-radius:6px;width:130px}
+  .ctrl input:focus{outline:2px solid var(--amber);outline-offset:1px}
+  #startdate.flash{animation:flashRing 1.6s ease-out}
+  @keyframes flashRing{0%,100%{box-shadow:none}20%,60%{box-shadow:0 0 0 3px var(--route)}}
+  .ctrl .hint{font-size:10px;color:var(--muted)}
+
+  .bar{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+  .btn{background:var(--asphalt2);border:1.5px solid #5a5f6b;color:var(--cream);font-family:inherit;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:11px 16px;border-radius:6px;
+    cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;font-weight:bold}
+  .btn:hover{border-color:var(--amber);color:var(--amber);background:#2e3038}
+  .btn.primary{background:var(--route);border-color:var(--route);color:#fff}
+  .btn.primary:hover{background:var(--route-dk);border-color:var(--route-dk);color:#fff}
+  .btn.ghost{margin-left:auto;color:var(--cream);border-color:#5a5f6b}
+  .btn.ghost:hover{border-color:var(--route);color:var(--route)}
+  #file{display:none}
+  #projfile{display:none}
+  .btn.save{border-color:var(--sign-lt);color:var(--sign-lt)}
+  .btn.save:hover{background:rgba(46,148,96,.12);border-color:var(--sign-lt);color:#3fb074}
+
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 0 6px;scrollbar-width:thin}
+  .tab{flex:0 0 auto;background:var(--asphalt2);border:1.5px solid #5a5f6b;color:var(--cream);
+    font-family:inherit;font-size:12px;font-weight:bold;padding:8px 13px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .tab:hover{color:var(--amber);border-color:var(--amber)}
+  .tab.active{background:var(--route);border-color:var(--route);color:#fff;box-shadow:var(--shadow)}
+  .tab .lbl{display:block;font-size:9px;font-weight:normal;letter-spacing:.1em;opacity:.95}
+
+  .day-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 18px;margin:18px 0 4px;padding-bottom:12px;border-bottom:2px solid var(--line)}
+  .day-num{font-family:Georgia,serif;font-size:30px;font-weight:800;color:var(--amber)}
+  .day-title{font-size:14px;color:var(--cream)}
+  .day-meta{margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--muted)}
+  .day-meta b{color:var(--sign-lt);font-size:15px}
+  .day-meta .warn b{color:var(--route)}
+  .depday{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 2px;padding:9px 12px;
+    background:rgba(232,163,61,.08);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:6px}
+  .depday label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+  .depday input{background:var(--asphalt);border:1px solid var(--line);color:var(--cream);font-family:inherit;font-size:15px;padding:6px 9px;border-radius:5px}
+  .depday input:focus{outline:2px solid var(--amber);outline-offset:1px}
+  .depday .depnote{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .depday .useDefault{background:transparent;border:1px solid var(--line);color:var(--muted);font-family:inherit;
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:5px;cursor:pointer;transition:.15s}
+  .depday .useDefault:hover{border-color:var(--amber);color:var(--amber)}
+
+  .timeline{list-style:none;margin:14px 0 0;position:relative}
+  .timeline::before{content:"";position:absolute;left:62px;top:6px;bottom:30px;width:2px;
+    background:repeating-linear-gradient(180deg,var(--amber) 0 8px,transparent 8px 16px)}
+  .stop{display:flex;gap:14px;align-items:flex-start;padding:7px 0;position:relative}
+  .clock{flex:0 0 50px;text-align:right;font-size:15px;font-weight:bold;color:var(--cream);padding-top:11px;font-variant-numeric:tabular-nums}
+  .clock small{display:block;font-size:9px;color:var(--muted);font-weight:normal;letter-spacing:.08em}
+  .dot{flex:0 0 22px;height:22px;margin-top:10px;border-radius:50%;background:var(--asphalt);border:3px solid var(--sign-lt);z-index:1;position:relative}
+  .stop.bed .dot{border-color:var(--route);background:var(--route)}
+  .stop.bed .dot::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--paper)}
+  .body{flex:1;min-width:0;background:var(--asphalt2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:var(--shadow)}
+  .stop.bed .body{border-color:var(--route-dk);background:#2c2326}
+  .stop.origin .dot{border-color:var(--amber);background:var(--amber)}
+  .stop.origin .body{border-style:dashed;border-color:#5a5f6b;background:rgba(240,178,74,.06)}
+  .stop.origin .clock{color:var(--amber)}
+  .start-badge{display:inline-block;background:var(--amber);color:#1c1d22;font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle;font-weight:bold}
+  .nm{font-size:14px;color:var(--cream);font-weight:bold;word-break:break-word}
+  .nm-edit{width:100%;background:transparent;border:1px solid transparent;color:var(--cream);font-family:inherit;
+    font-size:14px;font-weight:bold;padding:3px 5px;border-radius:5px;margin:-3px -5px 0;transition:.15s}
+  .nm-edit:hover{border-color:var(--line)}
+  .nm-edit:focus{outline:none;border-color:var(--amber);background:var(--asphalt)}
+  .drive{font-size:11px;color:var(--amber);margin-top:3px}
+  .drive.zero{color:var(--muted)}
+  .dwell{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .dwell label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .dwell input{background:var(--asphalt);border:1px solid var(--line);color:var(--cream);font-family:inherit;font-size:14px;padding:5px 7px;border-radius:5px;width:64px;text-align:center}
+  .dwell input:focus{outline:2px solid var(--amber);outline-offset:1px}
+  .dwell .unit{font-size:11px;color:var(--muted)}
+  .bed-badge{display:inline-block;background:var(--route);color:#fff;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle}
+  .arrival-final{margin:16px 0 0;padding:14px;border:1px dashed var(--sign-lt);border-radius:8px;text-align:center;background:rgba(46,148,96,.08)}
+  .arrival-final .t{font-size:24px;font-weight:bold;color:var(--sign-lt);font-family:Georgia,serif}
+  .arrival-final .l{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+  .arrival-final.late .t{color:var(--route)}
+  .meals{margin:16px 0 0;background:var(--asphalt2);border:1px solid var(--line);border-left:3px solid var(--sign-lt);border-radius:8px;padding:14px 14px 6px}
+  .meals-h{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sign-lt);font-weight:bold;margin-bottom:12px}
+  .meals-h span{color:var(--muted);letter-spacing:.04em;text-transform:none;font-weight:normal;font-size:10px}
+  .meal-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .meal-row .mi{flex:0 0 20px;font-size:15px;text-align:center}
+  .meal-row label{flex:0 0 74px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cream)}
+  .meal-row input{flex:1;min-width:0;background:var(--asphalt);border:1px solid var(--line);color:var(--cream);
+    font-family:inherit;font-size:14px;padding:8px 10px;border-radius:5px}
+  .meal-row input::placeholder{color:var(--muted);opacity:.7}
+  .meal-row input:focus{outline:2px solid var(--sign-lt);outline-offset:1px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--sign);color:#fff;
+    padding:12px 22px;border-radius:8px;font-size:13px;letter-spacing:.04em;box-shadow:0 6px 20px rgba(0,0,0,.4);transition:transform .3s;z-index:50}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--route)}
+  .modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:60;align-items:center;justify-content:center;padding:16px}
+  .modal-back.show{display:flex}
+  .modal{background:var(--asphalt2);border:1px solid var(--line);border-radius:12px;width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .modal-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .modal-h span{font-family:Georgia,serif;font-size:18px;font-weight:bold;color:var(--cream)}
+  .modal-x{background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 8px}
+  .modal-x:hover{color:var(--route)}
+  .modal-note{padding:11px 16px 0;font-size:12px;color:var(--amber);line-height:1.5}
+  #modalText{margin:12px 16px;background:var(--asphalt);border:1px solid var(--line);color:var(--cream);
+    font-family:'Courier New',monospace;font-size:12px;padding:11px;border-radius:7px;min-height:180px;flex:1;resize:none;white-space:pre;overflow:auto}
+  .modal-actions{display:flex;gap:10px;padding:0 16px 16px}
+  .modal-actions .btn{flex:1;justify-content:center}
+  footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px;letter-spacing:.04em}
+  @media(max-width:560px){.clock{flex-basis:42px;font-size:13px}.timeline::before{left:53px}.day-meta{width:100%;margin-left:0}.btn.ghost{margin-left:0}}
+
+  /* print: clean schedule */
+  @media print{
+    body{background:#fff;color:#000;background-image:none}
+    .controls,.bar,.tabs,.btn,footer .live,#file{display:none!important}
+    .timeline::before{background:#bbb}
+    .body{box-shadow:none;border-color:#ccc;background:#fff!important}
+    .stop.bed .body{background:#f6f6f6!important}
+    .clock,.nm,.day-num,.day-title,h1{color:#000!important;text-shadow:none}
+    .dot{border-color:#666!important;background:#fff!important}
+    .print-all{display:block!important}
+    #dayview{display:none}
+    .arrival-final{break-inside:avoid}
+  }
+  .print-all{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Class B Road Trip · Trip Odometer</div>
+  <h1>RV Day Timing</h1>
+  <div class="sub">Upload a GPX, set your departure, and dwell at each stop — arrivals roll forward automatically.</div>
+  <div id="tripname"></div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="ctrl">
+      <label for="depart">Default departure</label>
+      <input type="time" id="depart" value="08:30">
+      <span class="hint">starting point — override any day below</span>
+    </div>
+    <div class="ctrl">
+      <label for="speed">Avg driving speed</label>
+      <input type="number" id="speed" value="55" min="20" max="80" step="1">
+      <span class="hint">mph (incl. traffic / hills)</span>
+    </div>
+    <div class="ctrl">
+      <label for="startdate">Trip start date</label>
+      <input type="date" id="startdate">
+      <span class="hint">Day 1 — used for calendar export</span>
+    </div>
+    <div class="ctrl">
+      <label for="defdwell">Default stop time</label>
+      <input type="number" id="defdwell" value="45" min="0" max="600" step="5">
+      <span class="hint">minutes per sightseeing stop</span>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="btn primary" id="uploadBtn">⬆ Upload GPX</button>
+    <input type="file" id="file">
+    <button class="btn save" id="saveBtn">💾 Save project</button>
+    <button class="btn save" id="openBtn">📂 Open project</button>
+    <input type="file" id="projfile">
+    <button class="btn" id="copyBtn">⧉ Copy this day</button>
+    <button class="btn" id="icsBtn">🗓 Calendar (.ics)</button>
+    <button class="btn" id="printBtn">🖨 Print / PDF</button>
+    <button class="btn ghost" id="reset">Reset times</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="dayview"></div>
+  <div class="print-all" id="printall"></div>
+
+  <div class="modal-back" id="modalBack">
+    <div class="modal">
+      <div class="modal-h"><span id="modalTitle">Save</span><button class="modal-x" id="modalX">✕</button></div>
+      <div class="modal-note" id="modalNote"></div>
+      <textarea id="modalText" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="modalCopy">⧉ Copy all</button>
+        <button class="btn" id="modalDl">⬇ Try download</button>
+      </div>
+    </div>
+  </div>
+
+  <footer><span class="live">Drive distances measured from GPX route geometry · runs entirely in your browser · nothing is uploaded</span></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_TRIP = {"stops":[{"id":0,"day":0,"name":"Home","miles":0,"overnight":false},{"id":1,"day":0,"name":"1 Night at Cracker Barrel","miles":102.2,"overnight":true},{"id":2,"day":1,"name":"Harland Sanders Museum and Cafe","miles":179.1,"overnight":false},{"id":3,"day":1,"name":"1 Night at Wise Bird Cider HH","miles":91.6,"overnight":true},{"id":4,"day":2,"name":"Irons Fruit Farm","miles":114.4,"overnight":false},{"id":5,"day":2,"name":"1 Night at Drive in Theater HH","miles":75.5,"overnight":true},{"id":6,"day":3,"name":"House from A Christmas Story","miles":146.3,"overnight":false},{"id":7,"day":3,"name":"Sara's","miles":100.2,"overnight":false},{"id":8,"day":3,"name":"Aunt Millie's Family Restaurant & Bakery","miles":72.2,"overnight":false},{"id":9,"day":3,"name":"1 Night at Buffalo Riverworks","miles":35.5,"overnight":true},{"id":10,"day":4,"name":"Wonder Coffeehouse","miles":0.1,"overnight":false},{"id":11,"day":4,"name":"Statue of Uncle Sam","miles":8.0,"overnight":false},{"id":12,"day":4,"name":"Niagara-on-the-Lake","miles":32.5,"overnight":false},{"id":13,"day":4,"name":"Walker's Country Market","miles":2.4,"overnight":false},{"id":14,"day":4,"name":"COWS","miles":2.3,"overnight":false},{"id":15,"day":4,"name":"Tiny Church","miles":2.2,"overnight":false},{"id":16,"day":4,"name":"1 of 2 Nights at Riverside Park Motel & Campground","miles":25.7,"overnight":true},{"id":17,"day":5,"name":"Maid Of The Mist Boat Tour, Niagara Falls, Ontario","miles":15.0,"overnight":false},{"id":18,"day":5,"name":"Niagara Parks Power Station","miles":1.6,"overnight":false},{"id":19,"day":5,"name":"2 of 2 Nights at Riverside Park Motel & Campground","miles":8.7,"overnight":true},{"id":20,"day":6,"name":"World's Largest Golf Bag","miles":118.8,"overnight":false},{"id":21,"day":6,"name":"Elsie's Diner","miles":64.0,"overnight":false},{"id":22,"day":6,"name":"Tiny Church","miles":5.0,"overnight":false},{"id":23,"day":6,"name":"Farm Stand","miles":1.0,"overnight":false},{"id":24,"day":6,"name":"Big Upholstered Chair","miles":7.8,"overnight":false},{"id":25,"day":6,"name":"Wiarton Willie Statue","miles":3.4,"overnight":false},{"id":26,"day":6,"name":"Big Bay General Store","miles":11.9,"overnight":false},{"id":27,"day":6,"name":"Elliott's Garden Bakery & Greenhouse","miles":14.5,"overnight":false},{"id":28,"day":6,"name":"Handicraft House Trading Post","miles":3.2,"overnight":false},{"id":29,"day":6,"name":"Lion's Head Beach","miles":15.6,"overnight":false},{"id":30,"day":6,"name":"1 Night Boondockers Welcome","miles":14.7,"overnight":true},{"id":31,"day":7,"name":"The Grotto - Parking from 8am - 12pm (10am latest)","miles":20.6,"overnight":false},{"id":32,"day":7,"name":"Tobermory Brewing Company and Grill","miles":11.4,"overnight":false},{"id":33,"day":7,"name":"Chi-Cheemaun Ferry @ 5:45 PM","miles":0.8,"overnight":false},{"id":34,"day":7,"name":"1 Night Kicking Mule Ranch HH","miles":37.7,"overnight":true},{"id":35,"day":8,"name":"Manitowaning Lighthouse","miles":9.4,"overnight":false},{"id":36,"day":8,"name":"Lake Huron fish And Chips","miles":36.1,"overnight":false},{"id":37,"day":8,"name":"1 Night Meldrum Bay Campground","miles":56.1,"overnight":true},{"id":38,"day":9,"name":"Manitoulin Chocolate Works","miles":52.9,"overnight":false},{"id":39,"day":9,"name":"Boo Bah Loo Candy Corner","miles":0.5,"overnight":false},{"id":40,"day":9,"name":"Bridal Veil Falls","miles":0.1,"overnight":false},{"id":41,"day":9,"name":"Cup and Saucer Trail","miles":13.0,"overnight":false},{"id":42,"day":9,"name":"3 Cows And A Cone","miles":14.7,"overnight":false},{"id":43,"day":9,"name":"Little Current Swing Bridge","miles":1.2,"overnight":false},{"id":44,"day":9,"name":"1 Night at Boondock spot","miles":64.8,"overnight":true},{"id":45,"day":10,"name":"World's Largest Loonie","miles":100.5,"overnight":false},{"id":46,"day":10,"name":"Soo Locks","miles":20.0,"overnight":false},{"id":47,"day":10,"name":"1 Night Aune-Osborn Campground","miles":2.4,"overnight":true},{"id":48,"day":11,"name":"Mackinaw City, MI, United States","miles":59.7,"overnight":false},{"id":49,"day":11,"name":"1 Night Big Buck Brewery HH","miles":58.9,"overnight":true},{"id":50,"day":12,"name":"Dough Joe bakery shed","miles":13.5,"overnight":false},{"id":51,"day":12,"name":"Sarah roadside bakery","miles":8.6,"overnight":false},{"id":52,"day":12,"name":"The Farmers Creamery/The Farm Kitchen","miles":28.7,"overnight":false},{"id":53,"day":12,"name":"The Bakery","miles":3.5,"overnight":false},{"id":54,"day":12,"name":"Dairy Ace","miles":4.6,"overnight":false},{"id":55,"day":12,"name":"1 Night Austin Brothers Beer Co HH","miles":62.1,"overnight":true},{"id":56,"day":13,"name":"1940s Paul Bunyan and Babe","miles":13.7,"overnight":false},{"id":57,"day":13,"name":"Ed's Antiques and Collectibles","miles":19.9,"overnight":false},{"id":58,"day":13,"name":"Kenneth Roy Antiques","miles":0.7,"overnight":false},{"id":59,"day":13,"name":"Parkside Dairy","miles":16.7,"overnight":false},{"id":60,"day":13,"name":"SunnySide Coffee","miles":16.0,"overnight":false},{"id":61,"day":13,"name":"Cozy Cup Coffee Company","miles":1.5,"overnight":false},{"id":62,"day":13,"name":"Wilson's Cheese Shoppe","miles":45.6,"overnight":false},{"id":63,"day":13,"name":"Grand Traverse Pie Company","miles":37.5,"overnight":false},{"id":64,"day":13,"name":"Frankenmuth, MI","miles":44.0,"overnight":false},{"id":65,"day":13,"name":"1 Night at Tenacity Brewing HH","miles":28.7,"overnight":true},{"id":66,"day":14,"name":"Cook's Farm Dairy","miles":26.5,"overnight":false},{"id":67,"day":14,"name":"Human Fingers in a Jar","miles":128.5,"overnight":false},{"id":68,"day":14,"name":"Snook's Dream Cars","miles":0.6,"overnight":false},{"id":69,"day":14,"name":"Thomas Danbo Trolls","miles":122.8,"overnight":false},{"id":70,"day":14,"name":"1 Night Valley Vineyards HH","miles":49.1,"overnight":true},{"id":71,"day":15,"name":"Cream + Sugar Coffeehouse","miles":26.5,"overnight":false},{"id":72,"day":15,"name":"1 of 2 Nights Two Rivers Landing RV Resort","miles":277.1,"overnight":true},{"id":73,"day":16,"name":"Fireworks - Lake Douglas?","miles":16.0,"overnight":false},{"id":74,"day":16,"name":"Fireworks - Patriot Park","miles":28.1,"overnight":false},{"id":75,"day":16,"name":"2 of 2 Nights Two Rivers Landing RV Resort","miles":12.5,"overnight":true},{"id":76,"day":17,"name":"Richy Kreme Donuts","miles":27.2,"overnight":false},{"id":77,"day":17,"name":"Maryville, TN, United States","miles":3.6,"overnight":false},{"id":78,"day":17,"name":"Chatsworth, GA, United States","miles":89.1,"overnight":false},{"id":79,"day":17,"name":"Home","miles":68.7,"overnight":false}],"numDays":18};
+DEFAULT_TRIP.name = "Niagara Loop (sample)";
+
+let TRIP = DEFAULT_TRIP;
+let dwell = {};
+let dayDepart = {};   // per-day departure override, key=dayIndex -> "HH:MM"
+let meals = {};       // per-day meals, key=dayIndex -> {b,l,d}
+let customNames = {}; // per-stop renamed labels, key=stop id -> string
+let activeDay = 0;
+
+const $ = s => document.querySelector(s);
+const depEl=$('#depart'), spdEl=$('#speed'), defEl=$('#defdwell'), startEl=$('#startdate');
+
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast'+(err?' err':''),2200);}
+function fmt(mins){mins=((Math.round(mins)%1440)+1440)%1440;let h=Math.floor(mins/60),m=mins%60;const ap=h>=12?'PM':'AM';let hh=h%12;if(hh===0)hh=12;return hh+':'+String(m).padStart(2,'0')+' '+ap;}
+function hhmmToMins(v){const [h,m]=v.split(':').map(Number);return h*60+m;}
+function depMins(d){const v = (d!=null && dayDepart[d]) ? dayDepart[d] : depEl.value; return hhmmToMins(v);}
+function dwellFor(id){return dwell[id]!=null?dwell[id]:Number(defEl.value);}
+function driveMins(miles){return miles>0?(miles/Number(spdEl.value))*60:0;}
+function dayStops(d){return TRIP.stops.filter(s=>s.day===d);}
+function dayMiles(d){return dayStops(d).reduce((a,s)=>a+s.miles,0);}
+function cleanName(n){return n.replace(/^\d+ (of \d+ )?Nights?( at| )?/i,'').trim();}
+function displayName(s){return customNames[s.id]!=null && customNames[s.id]!=='' ? customNames[s.id] : cleanName(s.name);}
+
+// ---------- compute a day's schedule ----------
+// Each day STARTS at the previous day's final (overnight) stop. You depart that
+// origin at the day's departure time, then drive forward through the day's stops.
+function computeDay(d){
+  const ds=dayStops(d);
+  // origin = last stop of previous day (where you slept). Day 0 starts at its own first stop (Home).
+  const prev = d>0 ? dayStops(d-1) : null;
+  const origin = prev ? prev[prev.length-1] : null;
+
+  let t=depMins(d),driving=0;
+  const rows=[];
+
+  if(origin){
+    // you're parked at last night's stop; depart at t, no drive into it
+    rows.push({s:origin,arrive:t,dm:0,dw:0,origin:true});
+  }
+  ds.forEach((s,i)=>{
+    const dm=driveMins(s.miles);   // s.miles = drive INTO this stop from the one before it
+    // count the drive for every stop when we have an origin; for day 0 the first stop is Home (dm handled by i>0)
+    const isFirstReal = i===0;
+    if(origin || !isFirstReal){ t+=dm; driving+=dm; }
+    const dw=s.overnight?0:dwellFor(s.id);
+    rows.push({s,arrive:t,dm:(origin||!isFirstReal)?dm:0,dw});
+    t+=dw;
+  });
+  return {rows,driving,arriveFinal:rows[rows.length-1].arrive,endName:displayName(ds[ds.length-1])};
+}
+
+// ---------- GPX parsing ----------
+function hav(a,b){const R=3958.8,r=x=>x*Math.PI/180;const la1=r(a[0]),lo1=r(a[1]),la2=r(b[0]),lo2=r(b[1]);
+  const h=Math.sin((la2-la1)/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin((lo2-lo1)/2)**2;return 2*R*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
+
+function parseGPX(text,fname){
+  const xml=new DOMParser().parseFromString(text,'application/xml');
+  if(xml.querySelector('parsererror')) throw new Error('Not valid XML');
+  const wpts=[...xml.getElementsByTagName('wpt')];
+  if(!wpts.length) throw new Error('No waypoints (<wpt>) found in this GPX');
+  const stopsRaw=wpts.map(w=>({
+    lat:parseFloat(w.getAttribute('lat')),
+    lon:parseFloat(w.getAttribute('lon')),
+    name:(w.getElementsByTagName('name')[0]||{}).textContent||'Unnamed stop'
+  }));
+  // leg miles: prefer <rte> geometry, else straight-line between waypoints
+  const rtes=[...xml.getElementsByTagName('rte')];
+  let legs=[];
+  if(rtes.length>=stopsRaw.length-1 && rtes.length>0){
+    rtes.forEach(r=>{
+      const pts=[...r.getElementsByTagName('rtept')].map(p=>[parseFloat(p.getAttribute('lat')),parseFloat(p.getAttribute('lon'))]);
+      let d=0;for(let i=0;i<pts.length-1;i++)d+=hav(pts[i],pts[i+1]);
+      legs.push(d);
+    });
+  } else {
+    for(let i=0;i<stopsRaw.length-1;i++) legs.push(hav([stopsRaw[i].lat,stopsRaw[i].lon],[stopsRaw[i+1].lat,stopsRaw[i+1].lon]));
+  }
+  // build stops with day grouping by overnight
+  const stops=[];let day=0;
+  stopsRaw.forEach((s,i)=>{
+    const overnight=/night/i.test(s.name);
+    stops.push({id:i,day,name:s.name,miles:i>0?Math.round((legs[i-1]||0)*10)/10:0,overnight});
+    if(overnight) day++;
+  });
+  const numDays=Math.max(1,(stops[stops.length-1].overnight?day:day+1));
+  return {name:fname.replace(/\.gpx$/i,''),stops,numDays};
+}
+
+function loadTrip(trip){
+  TRIP=trip;dwell={};dayDepart={};meals={};customNames={};activeDay=0;
+  $('#tripname').textContent='▸ '+trip.name+' · '+trip.stops.length+' stops · '+trip.numDays+' days';
+  render();
+  toast('Loaded '+trip.stops.length+' stops across '+trip.numDays+' days');
+}
+
+// ---------- render ----------
+function buildTabs(){
+  const t=$('#tabs');t.innerHTML='';
+  for(let d=0;d<TRIP.numDays;d++){
+    const b=document.createElement('button');
+    b.className='tab'+(d===activeDay?' active':'');
+    b.innerHTML='Day '+(d+1)+'<span class="lbl">'+Math.round(dayMiles(d))+' mi</span>';
+    b.onclick=()=>{activeDay=d;render();};
+    t.appendChild(b);
+  }
+}
+function render(){
+  buildTabs();
+  const {rows,driving,arriveFinal,endName}=computeDay(activeDay);
+  const v=$('#dayview');v.innerHTML='';
+  const head=document.createElement('div');head.className='day-head';
+  const drvH=driving/60,totH=(arriveFinal-depMins(activeDay))/60,longDay=driving>270;
+  head.innerHTML='<span class="day-num">'+(activeDay+1)+'</span><span class="day-title">overnight: '+(endName||'\u2014')+'</span>'+
+    '<span class="day-meta"><span>drive&nbsp;<b>'+Math.round(dayMiles(activeDay))+' mi</b></span>'+
+    '<span class="'+(longDay?'warn':'')+'">wheel time&nbsp;<b>'+drvH.toFixed(1)+' h</b></span>'+
+    '<span>day span&nbsp;<b>'+totH.toFixed(1)+' h</b></span></span>';
+  v.appendChild(head);
+
+  // per-day departure control
+  const depRow=document.createElement('div');
+  depRow.className='depday';
+  const overridden = !!dayDepart[activeDay];
+  depRow.innerHTML='<label>Leave camp this day</label>'+
+    '<input type="time" id="daydep" value="'+(dayDepart[activeDay]||depEl.value)+'">'+
+    (overridden?'<button class="useDefault" id="usedef">use default ('+depEl.value+')</button>':'<span class="depnote">default</span>');
+  v.appendChild(depRow);
+  const ul=document.createElement('ul');ul.className='timeline';
+  rows.forEach((r,i)=>{
+    const li=document.createElement('li');
+    li.className='stop'+(r.origin?' origin':(r.s.overnight?' bed':''));
+    if(r.origin){
+      li.innerHTML='<div class="clock" data-idx="'+i+'">'+fmt(r.arrive)+'<small>depart</small></div><div class="dot"></div>'+
+        '<div class="body"><div class="nm">'+displayName(r.s)+'<span class="start-badge">last night\u2019s camp</span></div>'+
+        '<div class="drive zero">\u25b8 pull out and start driving</div></div>';
+      ul.appendChild(li);return;
+    }
+    const driveTxt=r.dm>0?'▸ drove '+r.s.miles.toFixed(0)+' mi · '+Math.round(r.dm)+' min':(i===0?'▸ start of day':'▸ same stop');
+    li.innerHTML='<div class="clock" data-idx="'+i+'">'+fmt(r.arrive)+'<small>arrive</small></div><div class="dot"></div>'+
+      '<div class="body"><input class="nm-edit" type="text" data-id="'+r.s.id+'" value="'+displayName(r.s).replace(/"/g,'&quot;')+'">'+(r.s.overnight?'<span class="bed-badge">overnight</span>':'')+
+      '<div class="drive'+(r.dm>0?'':' zero')+'">'+driveTxt+'</div>'+
+      (r.s.overnight?'':'<div class="dwell"><label>stop for</label><input type="number" inputmode="numeric" min="0" max="600" step="5" value="'+dwellFor(r.s.id)+'" data-id="'+r.s.id+'"><span class="unit" data-leave="'+i+'">min · leave '+fmt(r.arrive+r.dw)+'</span></div>')+
+      '</div>';
+    ul.appendChild(li);
+  });
+  v.appendChild(ul);
+  const af=document.createElement('div');const late=arriveFinal>19*60;
+  af.className='arrival-final'+(late?' late':'');af.id='finalArrive';
+  af.innerHTML='<div class="t">'+fmt(arriveFinal)+'</div><div class="l">'+(late?'late arrival — consider an earlier start':'roll into camp')+'</div>';
+  v.appendChild(af);
+
+  // meals panel (separate from timing)
+  const m = meals[activeDay] || {};
+  const meal=document.createElement('div');
+  meal.className='meals';
+  meal.innerHTML=
+    '<div class="meals-h">Meal plan <span>— notes only, doesn\u2019t affect timing</span></div>'+
+    '<div class="meal-row"><span class="mi">\u2600\ufe0f</span><label>Breakfast</label>'+
+      '<input type="text" data-meal="b" placeholder="e.g. oatmeal in the rig / Dough Joe\u2019s" value="'+(m.b||'').replace(/"/g,'&quot;')+'"></div>'+
+    '<div class="meal-row"><span class="mi">\u{1F96A}</span><label>Lunch</label>'+
+      '<input type="text" data-meal="l" placeholder="e.g. picnic at the falls" value="'+(m.l||'').replace(/"/g,'&quot;')+'"></div>'+
+    '<div class="meal-row"><span class="mi">\u{1F37D}\ufe0f</span><label>Dinner</label>'+
+      '<input type="text" data-meal="d" placeholder="e.g. brewery at camp" value="'+(m.d||'').replace(/"/g,'&quot;')+'"></div>';
+  v.appendChild(meal);
+
+  v.querySelectorAll('.meal-row input').forEach(inp=>inp.addEventListener('input',e=>{
+    if(!meals[activeDay]) meals[activeDay]={};
+    meals[activeDay][e.target.dataset.meal]=e.target.value;
+  }));
+  // dwell: update value + recompute clocks in place (no rebuild → keeps focus)
+  v.querySelectorAll('.dwell input').forEach(inp=>inp.addEventListener('input',e=>{
+    dwell[Number(e.target.dataset.id)]=e.target.value===''?0:Number(e.target.value);
+    updateClocks();
+    updateTabMiles();
+  }));
+  // stop name editing
+  v.querySelectorAll('.nm-edit').forEach(inp=>inp.addEventListener('input',e=>{
+    customNames[Number(e.target.dataset.id)]=e.target.value;
+  }));
+  const dd=$('#daydep');
+  if(dd) dd.addEventListener('input',e=>{ dayDepart[activeDay]=e.target.value; updateClocks(); });
+  const ud=$('#usedef');
+  if(ud) ud.addEventListener('click',()=>{ delete dayDepart[activeDay]; render(); });
+}
+
+// recompute just the time labels for the active day, without rebuilding inputs
+function updateClocks(){
+  const {rows,arriveFinal,driving}=computeDay(activeDay);
+  rows.forEach((r,i)=>{
+    const c=document.querySelector('.clock[data-idx="'+i+'"]');
+    if(c){const lbl=r.origin?'depart':'arrive';c.innerHTML=fmt(r.arrive)+'<small>'+lbl+'</small>';}
+    const lv=document.querySelector('.unit[data-leave="'+i+'"]');
+    if(lv && !r.origin && !r.s.overnight) lv.textContent='min · leave '+fmt(r.arrive+r.dw);
+  });
+  const af=document.getElementById('finalArrive');
+  if(af){const late=arriveFinal>19*60;af.className='arrival-final'+(late?' late':'');
+    af.querySelector('.t').textContent=fmt(arriveFinal);
+    af.querySelector('.l').textContent=late?'late arrival — consider an earlier start':'roll into camp';}
+  // update day-meta wheel/span
+  const meta=document.querySelectorAll('.day-meta b');
+  if(meta.length>=3){meta[1].textContent=(driving/60).toFixed(1)+' h';meta[2].textContent=((arriveFinal-depMins(activeDay))/60).toFixed(1)+' h';}
+}
+function updateTabMiles(){/* miles don't change on dwell; placeholder for future */}
+
+// ---------- exports ----------
+function dayText(d){
+  const {rows,arriveFinal,endName}=computeDay(d);
+  let out='DAY '+(d+1)+' — '+Math.round(dayMiles(d))+' mi — overnight: '+(endName||'')+'\n';
+  rows.forEach((r,i)=>{
+    if(r.origin){
+      out+='  '+fmt(r.arrive).padStart(8)+'  Depart '+displayName(r.s)+' (last night\u2019s camp)\n';
+      return;
+    }
+    out+='  '+fmt(r.arrive).padStart(8)+'  '+displayName(r.s);
+    if(!r.s.overnight && r.dw>0) out+='  ('+r.dw+' min, leave '+fmt(r.arrive+r.dw)+')';
+    if(r.s.overnight) out+='  [OVERNIGHT]';
+    out+='\n';
+  });
+  const m=meals[d];
+  if(m && (m.b||m.l||m.d)){
+    out+='  Meals:\n';
+    if(m.b) out+='    Breakfast: '+m.b+'\n';
+    if(m.l) out+='    Lunch: '+m.l+'\n';
+    if(m.d) out+='    Dinner: '+m.d+'\n';
+  }
+  return out;
+}
+function copyDay(){
+  const text=TRIP.name+'\n\n'+dayText(activeDay);
+  navigator.clipboard.writeText(text).then(()=>toast('Day '+(activeDay+1)+' copied')).catch(()=>{
+    showOutput('Day '+(activeDay+1)+' schedule','Copy this and paste into Notes or an email.',text,'day'+(activeDay+1)+'.txt','text/plain');
+  });
+}
+function buildPrintAll(){
+  let s=TRIP.name+'\n\n';
+  for(let d=0;d<TRIP.numDays;d++) s+=dayText(d)+'\n';
+  $('#printall').innerHTML='<h2 style="font-family:Georgia,serif">'+TRIP.name+'</h2><pre style="white-space:pre-wrap;font-size:13px;line-height:1.5">'+s.replace(/[<>]/g,'')+'</pre>';
+}
+// ICS: anchor day 1 to today, each subsequent day +1 calendar day. Times = local floating.
+function pad(n){return String(n).padStart(2,'0');}
+function icsDate(baseDate,dayOffset,mins){
+  const dt=new Date(baseDate);dt.setDate(dt.getDate()+dayOffset);
+  const h=Math.floor(((mins%1440)+1440)%1440/60),m=Math.round(mins)%60;
+  return dt.getFullYear()+pad(dt.getMonth()+1)+pad(dt.getDate())+'T'+pad(h)+pad(m)+'00';
+}
+function exportICS(){
+  // require a start date so events never silently land on "today"
+  if(!startEl.value){
+    toast('Set your Trip start date first (top of page)',true);
+    startEl.scrollIntoView({behavior:'smooth',block:'center'});
+    startEl.classList.add('flash');
+    setTimeout(()=>startEl.classList.remove('flash'),1600);
+    try{ startEl.focus(); if(startEl.showPicker) startEl.showPicker(); }catch(e){}
+    return;
+  }
+  // base = user's trip start date (local midnight)
+  let base;
+  { const [y,mo,da]=startEl.value.split('-').map(Number); base=new Date(y,mo-1,da); }
+  base.setHours(0,0,0,0);
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//RV Timing//EN\r\nCALSCALE:GREGORIAN\r\n';
+  let uid=0;
+  const esc=s=>String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+  const ymd=x=>x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate());
+  for(let d=0;d<TRIP.numDays;d++){
+    const {rows,arriveFinal,endName}=computeDay(d);
+    // ----- ONE stops event for the whole day -----
+    const first=rows[0], dayStart=first.arrive;
+    const lines=rows.map(r=>{
+      if(r.origin) return fmt(r.arrive)+'  Depart '+displayName(r.s)+' (camp)';
+      let line=fmt(r.arrive)+'  '+displayName(r.s);
+      if(r.s.overnight) line+='  [overnight]';
+      else if(r.dw>0) line+='  ('+r.dw+'m, leave '+fmt(r.arrive+r.dw)+')';
+      return line;
+    });
+    const miles=Math.round(dayMiles(d));
+    ics+='BEGIN:VEVENT\r\nUID:rvday'+(uid++)+'-'+Date.now()+'@local\r\n';
+    ics+='DTSTART:'+icsDate(base,d,dayStart)+'\r\nDTEND:'+icsDate(base,d,arriveFinal)+'\r\n';
+    ics+='SUMMARY:'+esc('\u{1F698} Day '+(d+1)+': '+(endName||'Travel')+' \u00b7 '+miles+' mi')+'\r\n';
+    ics+='DESCRIPTION:'+esc(lines.join('\n'))+'\r\nEND:VEVENT\r\n';
+    // ----- ONE meals event (all-day) -----
+    const m=meals[d];
+    if(m && (m.b||m.l||m.d)){
+      const dt=new Date(base);dt.setDate(dt.getDate()+d);
+      const dt2=new Date(base);dt2.setDate(dt2.getDate()+d+1);
+      let parts=[];if(m.b)parts.push('Breakfast: '+m.b);if(m.l)parts.push('Lunch: '+m.l);if(m.d)parts.push('Dinner: '+m.d);
+      ics+='BEGIN:VEVENT\r\nUID:rvmeal'+(uid++)+'-'+Date.now()+'@local\r\n';
+      ics+='DTSTART;VALUE=DATE:'+ymd(dt)+'\r\nDTEND;VALUE=DATE:'+ymd(dt2)+'\r\n';
+      ics+='SUMMARY:'+esc('\u{1F37D}\ufe0f Day '+(d+1)+' meals')+'\r\n';
+      ics+='DESCRIPTION:'+esc(parts.join('\n'))+'\r\nEND:VEVENT\r\n';
+    }
+  }
+  ics+='END:VCALENDAR';
+  showOutput('Calendar (.ics)',
+    'Starts '+startEl.value+'. Two entries per day: one for stops (with times), one for meals. Copy this, or Try download, then open the .ics in Calendar.',
+    ics, TRIP.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.ics','text/calendar');
+}
+
+// ---------- universal output modal (works even where downloads are blocked) ----------
+let pendingDownload=null;
+function showOutput(title,note,text,filename,mime){
+  $('#modalTitle').textContent=title;
+  $('#modalNote').textContent=note;
+  $('#modalText').value=text;
+  pendingDownload={text,filename,mime};
+  $('#modalBack').classList.add('show');
+}
+function tryDownload(){
+  if(!pendingDownload)return;
+  try{
+    const blob=new Blob([pendingDownload.text],{type:pendingDownload.mime});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=pendingDownload.filename;
+    document.body.appendChild(a);a.click();a.remove();
+    toast('If nothing appeared, use Copy instead');
+  }catch(e){toast('Download blocked here — use Copy',true);}
+}
+function copyModal(){
+  const ta=$('#modalText');ta.select();ta.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(ta.value).then(()=>toast('Copied — paste into Notes or email')).catch(()=>{
+    try{document.execCommand('copy');toast('Copied');}catch(e){toast('Select the text and copy manually',true);}
+  });
+}
+
+// ---------- wire up ----------
+[depEl,spdEl,defEl].forEach(el=>el.addEventListener('input',render));
+$('#uploadBtn').onclick=()=>$('#file').click();
+$('#file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{loadTrip(parseGPX(rd.result,f.name));}catch(err){toast('Could not read GPX: '+err.message,true);}};
+  rd.onerror=()=>toast('Could not read that file',true);
+  rd.readAsText(f);
+  e.target.value='';
+};
+$('#copyBtn').onclick=copyDay;
+$('#icsBtn').onclick=exportICS;
+$('#printBtn').onclick=()=>{buildPrintAll();window.print();};
+$('#reset').onclick=()=>{dwell={};dayDepart={};meals={};customNames={};depEl.value='08:30';spdEl.value=55;defEl.value=45;render();toast('Times reset');};
+
+// ---------- save / open project ----------
+function saveProject(){
+  const proj={
+    format:'rv-timing-project', version:1,
+    trip:TRIP,
+    settings:{depart:depEl.value, speed:Number(spdEl.value), defdwell:Number(defEl.value), startdate:startEl.value},
+    dwell, dayDepart, meals, customNames,
+    activeDay
+  };
+  const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});
+  const fname=(TRIP.name||'rv-trip').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.rvtrip.json';
+  showOutput('Save project',
+    'This is your full plan (route, names, times, meals). Copy it into a note or email to save/share. Tap Try download to save as a file in a real browser. To reload it later, paste into Open project.',
+    JSON.stringify(proj,null,2), fname, 'application/json');
+}
+function openProject(text){
+  let p;
+  try{ p=JSON.parse(text); }catch(e){ toast('Not a valid project file',true);return; }
+  if(!p || p.format!=='rv-timing-project' || !p.trip){ toast('Not an RV timing project file',true);return; }
+  TRIP=p.trip;
+  dwell=p.dwell||{}; dayDepart=p.dayDepart||{}; meals=p.meals||{}; customNames=p.customNames||{};
+  if(p.settings){ depEl.value=p.settings.depart||'08:30'; spdEl.value=p.settings.speed||55; defEl.value=p.settings.defdwell||45; startEl.value=p.settings.startdate||''; }
+  activeDay=Math.min(p.activeDay||0, TRIP.numDays-1);
+  $('#tripname').textContent='▸ '+(TRIP.name||'Trip')+' · '+TRIP.stops.length+' stops · '+TRIP.numDays+' days';
+  render();
+  toast('Project loaded');
+}
+$('#saveBtn').onclick=saveProject;
+$('#openBtn').onclick=openProjectPrompt;
+$('#projfile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>openProject(rd.result);
+  rd.onerror=()=>toast('Could not read that file',true);
+  rd.readAsText(f);
+  e.target.value='';
+};
+// Open: offer paste box (works in preview) with a file-pick option
+function openProjectPrompt(){
+  $('#modalTitle').textContent='Open project';
+  $('#modalNote').innerHTML='Paste your saved project text below and tap Load. Or tap Pick file to choose a .rvtrip.json (works in a full browser).';
+  const ta=$('#modalText'); ta.value=''; ta.readOnly=false; ta.placeholder='Paste project text here…';
+  pendingDownload=null;
+  $('#modalBack').classList.add('show');
+  $('#modalCopy').textContent='✓ Load';
+  $('#modalDl').textContent='📂 Pick file';
+  openMode=true;
+}
+let openMode=false;
+
+// modal buttons
+$('#modalX').onclick=()=>{closeModal();};
+$('#modalBack').onclick=e=>{if(e.target.id==='modalBack')closeModal();};
+$('#modalCopy').onclick=()=>{
+  if(openMode){ openProject($('#modalText').value); closeModal(); }
+  else copyModal();
+};
+$('#modalDl').onclick=()=>{
+  if(openMode){ closeModal(); $('#projfile').click(); }
+  else tryDownload();
+};
+function closeModal(){
+  $('#modalBack').classList.remove('show');
+  const ta=$('#modalText'); ta.readOnly=true; ta.placeholder='';
+  $('#modalCopy').textContent='⧉ Copy all'; $('#modalDl').textContent='⬇ Try download';
+  openMode=false;
+}
+
+loadTrip(DEFAULT_TRIP);
+</script>
+</body>
+</html>
