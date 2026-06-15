@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 // On Fly.io a persistent volume is mounted at /data (see fly.toml). Falls back
 // to the repo's checked-in copy for local/static-only setups.
 const DATA_DIR = process.env.DATA_DIR || __dirname;
