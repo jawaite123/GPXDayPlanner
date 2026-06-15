@@ -316,12 +316,18 @@ function loadTrip(trip){
 }
 
 // ---------- render ----------
+function tabDate(d){
+  if(!startEl.value) return '';
+  const [y,mo,da]=startEl.value.split('-').map(Number);
+  const dt=new Date(y,mo-1,da); dt.setDate(dt.getDate()+d);
+  return dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
 function buildTabs(){
   const t=$('#tabs');t.innerHTML='';
   for(let d=0;d<TRIP.numDays;d++){
     const b=document.createElement('button');
     b.className='tab'+(d===activeDay?' active':'');
-    b.innerHTML='Day '+(d+1)+'<span class="lbl">'+Math.round(dayMiles(d))+' mi</span>';
+    b.innerHTML='Day '+(d+1)+'<span class="lbl">'+(tabDate(d)?tabDate(d)+' · ':'')+Math.round(dayMiles(d))+' mi</span>';
     b.onclick=()=>{activeDay=d;render();};
     t.appendChild(b);
   }
