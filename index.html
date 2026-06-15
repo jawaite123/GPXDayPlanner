@@ -6,17 +6,17 @@
 <title>RV Loop — Day Timing</title>
 <style>
   :root{
-    --asphalt:#1c1d22; --asphalt2:#26282f; --cream:#f3ead6; --paper:#fbf6ea;
-    --route:#d8482b; --route-dk:#a8331c; --sign:#1f6f43; --sign-lt:#2e9460;
-    --amber:#f0b24a; --line:#3a3d46; --ink:#2a2a2a; --muted:#b3b8c4;
-    --shadow:0 2px 0 rgba(0,0,0,.25);
+    --asphalt:#f5f1e6; --asphalt2:#ffffff; --cream:#2a2a2a; --paper:#fbf6ea;
+    --route:#d8482b; --route-dk:#a8331c; --sign:#1f6f43; --sign-lt:#1f8a55;
+    --amber:#c4791a; --line:#ddd6c4; --ink:#2a2a2a; --muted:#7a7568;
+    --shadow:0 2px 0 rgba(0,0,0,.08);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
     background:var(--asphalt);color:var(--cream);
-    font-family:'Courier New',ui-monospace,monospace;line-height:1.4;padding-bottom:60px;
-    background-image:repeating-linear-gradient(0deg,transparent,transparent 78px,rgba(255,255,255,.015) 78px,rgba(255,255,255,.015) 80px);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.4;padding-bottom:60px;
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 78px,rgba(0,0,0,.02) 78px,rgba(0,0,0,.02) 80px);
   }
   .wrap{max-width:880px;margin:0 auto;padding:0 16px}
   header{padding:30px 16px 18px;text-align:center}
@@ -60,6 +60,7 @@
 
   .day-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 18px;margin:18px 0 4px;padding-bottom:12px;border-bottom:2px solid var(--line)}
   .day-num{font-family:Georgia,serif;font-size:30px;font-weight:800;color:var(--amber)}
+  .day-date{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
   .day-title{font-size:14px;color:var(--cream)}
   .day-meta{margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--muted)}
   .day-meta b{color:var(--sign-lt);font-size:15px}
@@ -84,7 +85,7 @@
   .stop.bed .dot{border-color:var(--route);background:var(--route)}
   .stop.bed .dot::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--paper)}
   .body{flex:1;min-width:0;background:var(--asphalt2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:var(--shadow)}
-  .stop.bed .body{border-color:var(--route-dk);background:#2c2326}
+  .stop.bed .body{border-color:var(--route-dk);background:#fbeae4}
   .stop.origin .dot{border-color:var(--amber);background:var(--amber)}
   .stop.origin .body{border-style:dashed;border-color:#5a5f6b;background:rgba(240,178,74,.06)}
   .stop.origin .clock{color:var(--amber)}
@@ -315,12 +316,18 @@ function loadTrip(trip){
 }
 
 // ---------- render ----------
+function tabDate(d){
+  if(!startEl.value) return '';
+  const [y,mo,da]=startEl.value.split('-').map(Number);
+  const dt=new Date(y,mo-1,da); dt.setDate(dt.getDate()+d);
+  return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+}
 function buildTabs(){
   const t=$('#tabs');t.innerHTML='';
   for(let d=0;d<TRIP.numDays;d++){
     const b=document.createElement('button');
     b.className='tab'+(d===activeDay?' active':'');
-    b.innerHTML='Day '+(d+1)+'<span class="lbl">'+Math.round(dayMiles(d))+' mi</span>';
+    b.innerHTML='Day '+(d+1)+(tabDate(d)?'<span class="lbl">'+tabDate(d)+'</span>':'');
     b.onclick=()=>{activeDay=d;render();};
     t.appendChild(b);
   }
@@ -331,7 +338,13 @@ function render(){
   const v=$('#dayview');v.innerHTML='';
   const head=document.createElement('div');head.className='day-head';
   const drvH=driving/60,totH=(arriveFinal-depMins(activeDay))/60,longDay=driving>270;
-  head.innerHTML='<span class="day-num">'+(activeDay+1)+'</span><span class="day-title">overnight: '+(endName||'\u2014')+'</span>'+
+  let dateStr='';
+  if(startEl.value){
+    const [y,mo,da]=startEl.value.split('-').map(Number);
+    const dt=new Date(y,mo-1,da); dt.setDate(dt.getDate()+activeDay);
+    dateStr=dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+  }
+  head.innerHTML='<span class="day-num">'+(activeDay+1)+'</span>'+(dateStr?'<span class="day-date">'+dateStr+'</span>':'')+'<span class="day-title">overnight: '+(endName||'\u2014')+'</span>'+
     '<span class="day-meta"><span>drive&nbsp;<b>'+Math.round(dayMiles(activeDay))+' mi</b></span>'+
     '<span class="'+(longDay?'warn':'')+'">wheel time&nbsp;<b>'+drvH.toFixed(1)+' h</b></span>'+
     '<span>day span&nbsp;<b>'+totH.toFixed(1)+' h</b></span></span>';
@@ -425,7 +438,13 @@ function updateTabMiles(){/* miles don't change on dwell; placeholder for future
 // ---------- exports ----------
 function dayText(d){
   const {rows,arriveFinal,endName}=computeDay(d);
-  let out='DAY '+(d+1)+' — '+Math.round(dayMiles(d))+' mi — overnight: '+(endName||'')+'\n';
+  let dateStr='';
+  if(startEl.value){
+    const [y,mo,da]=startEl.value.split('-').map(Number);
+    const dt=new Date(y,mo-1,da); dt.setDate(dt.getDate()+d);
+    dateStr=' — '+dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+  }
+  let out='DAY '+(d+1)+dateStr+' — '+Math.round(dayMiles(d))+' mi — overnight: '+(endName||'')+'\n';
   rows.forEach((r,i)=>{
     if(r.origin){
       out+='  '+fmt(r.arrive).padStart(8)+'  Depart '+displayName(r.s)+' (last night\u2019s camp)\n';
@@ -541,7 +560,7 @@ function copyModal(){
 }
 
 // ---------- wire up ----------
-[depEl,spdEl,defEl].forEach(el=>el.addEventListener('input',render));
+[depEl,spdEl,defEl,startEl].forEach(el=>el.addEventListener('input',render));
 $('#uploadBtn').onclick=()=>$('#file').click();
 $('#file').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
