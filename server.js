@@ -36,4 +36,4 @@ app.post('/api/default-trip', (req, res) => {
   });
 });
 
-app.listen(PORT, () => console.log(`GPX Day Planner running on http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`GPX Day Planner running on http://0.0.0.0:${PORT}`));
