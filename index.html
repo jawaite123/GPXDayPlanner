@@ -6,17 +6,17 @@
 <title>RV Loop — Day Timing</title>
 <style>
   :root{
-    --asphalt:#1c1d22; --asphalt2:#26282f; --cream:#f3ead6; --paper:#fbf6ea;
-    --route:#d8482b; --route-dk:#a8331c; --sign:#1f6f43; --sign-lt:#2e9460;
-    --amber:#f0b24a; --line:#3a3d46; --ink:#2a2a2a; --muted:#b3b8c4;
-    --shadow:0 2px 0 rgba(0,0,0,.25);
+    --asphalt:#f5f1e6; --asphalt2:#ffffff; --cream:#2a2a2a; --paper:#fbf6ea;
+    --route:#d8482b; --route-dk:#a8331c; --sign:#1f6f43; --sign-lt:#1f8a55;
+    --amber:#c4791a; --line:#ddd6c4; --ink:#2a2a2a; --muted:#7a7568;
+    --shadow:0 2px 0 rgba(0,0,0,.08);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
     background:var(--asphalt);color:var(--cream);
     font-family:'Courier New',ui-monospace,monospace;line-height:1.4;padding-bottom:60px;
-    background-image:repeating-linear-gradient(0deg,transparent,transparent 78px,rgba(255,255,255,.015) 78px,rgba(255,255,255,.015) 80px);
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 78px,rgba(0,0,0,.02) 78px,rgba(0,0,0,.02) 80px);
   }
   .wrap{max-width:880px;margin:0 auto;padding:0 16px}
   header{padding:30px 16px 18px;text-align:center}
@@ -84,7 +84,7 @@
   .stop.bed .dot{border-color:var(--route);background:var(--route)}
   .stop.bed .dot::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--paper)}
   .body{flex:1;min-width:0;background:var(--asphalt2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:var(--shadow)}
-  .stop.bed .body{border-color:var(--route-dk);background:#2c2326}
+  .stop.bed .body{border-color:var(--route-dk);background:#fbeae4}
   .stop.origin .dot{border-color:var(--amber);background:var(--amber)}
   .stop.origin .body{border-style:dashed;border-color:#5a5f6b;background:rgba(240,178,74,.06)}
   .stop.origin .clock{color:var(--amber)}
