@@ -19,6 +19,20 @@ npm start
 
 Then open `http://localhost:3000`.
 
+### Deploying to Fly.io
+
+The app is set up to run on [Fly.io](https://fly.io) with a persistent volume so the
+"default" trip survives deploys and restarts.
+
+```
+fly launch    # first time only — creates the app, accept the generated fly.toml
+fly volumes create gpxdayplanner_data --size 1 --region iad
+fly deploy
+```
+
+`default-trip.json` is read from/written to `/data` (a Fly volume), seeded from the
+repo's copy on first boot.
+
 ## Features
 
 - **GPX upload** — parses waypoints and route geometry entirely in the browser.
