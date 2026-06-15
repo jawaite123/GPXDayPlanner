@@ -190,6 +190,7 @@
     <input type="file" id="file">
     <button class="btn save" id="saveBtn">💾 Save project</button>
     <button class="btn save" id="openBtn">📂 Open project</button>
+    <button class="btn save" id="setDefaultBtn">⭐ Set as default</button>
     <input type="file" id="projfile">
     <button class="btn" id="copyBtn">⧉ Copy this day</button>
     <button class="btn" id="icsBtn">🗓 Calendar (.ics)</button>
@@ -626,6 +627,12 @@ function openProject(text){
 }
 $('#saveBtn').onclick=saveProject;
 $('#openBtn').onclick=openProjectPrompt;
+$('#setDefaultBtn').onclick=()=>{
+  fetch('/api/default-trip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(currentProject())})
+    .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
+    .then(()=>toast('Saved as default trip'))
+    .catch(()=>toast('Could not save default (server not available)',true));
+};
 $('#projfile').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const rd=new FileReader();
@@ -672,7 +679,7 @@ function closeModal(){
     loadProject(saved);
     return;
   }
-  fetch('default-trip.json').then(r=>r.json()).then(p=>{
+  fetch('/api/default-trip').then(r=>r.json()).then(p=>{
     if(p && p.format==='rv-timing-project' && p.trip){ loadProject(p); persist(); }
     else loadTrip(p);
   }).catch(()=>loadTrip(FALLBACK_TRIP));

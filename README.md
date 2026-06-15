@@ -1,12 +1,23 @@
 # RV Day Timing
 
-A single-file, offline web app for planning the daily timing of a road trip from a
-GPX route. Upload a GPX, set a departure time and average driving speed, and the app
-rolls arrival times forward across every stop and every day. Built for Class B / RV
-trip planning where stops, dwell times, and overnight camps matter.
+A web app for planning the daily timing of a road trip from a GPX route. Upload a
+GPX, set a departure time and average driving speed, and the app rolls arrival times
+forward across every stop and every day. Built for Class B / RV trip planning where
+stops, dwell times, and overnight camps matter.
 
-Everything runs in the browser. There is no backend, no build step, and no network
-dependency — open `rv-timing.html` in a browser and it works, including offline.
+The UI is a single static HTML/CSS/JS page and can be opened directly in a browser
+(it then keeps state in `localStorage`). A small Node/Express server is also included
+that serves the page and provides an API to persist the "default" trip to
+`default-trip.json` on disk via the **Set as default** button.
+
+### Running the server
+
+```
+npm install
+npm start
+```
+
+Then open `http://localhost:3000`.
 
 ## Features
 
