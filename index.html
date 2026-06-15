@@ -311,7 +311,31 @@ function loadTrip(trip){
   TRIP=trip;dwell={};dayDepart={};meals={};customNames={};activeDay=0;
   $('#tripname').textContent='▸ '+trip.name+' · '+trip.stops.length+' stops · '+trip.numDays+' days';
   render();
+  persist();
   toast('Loaded '+trip.stops.length+' stops across '+trip.numDays+' days');
+}
+
+// ---------- persistence ----------
+const LS_KEY='rvTripProject';
+function currentProject(){
+  return {
+    format:'rv-timing-project', version:1,
+    trip:TRIP,
+    settings:{depart:depEl.value, speed:Number(spdEl.value), defdwell:Number(defEl.value), startdate:startEl.value},
+    dwell, dayDepart, meals, customNames,
+    activeDay
+  };
+}
+function persist(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(currentProject())); }catch(e){}
+}
+function loadProject(p){
+  TRIP=p.trip;
+  dwell=p.dwell||{}; dayDepart=p.dayDepart||{}; meals=p.meals||{}; customNames=p.customNames||{};
+  if(p.settings){ depEl.value=p.settings.depart||'08:30'; spdEl.value=p.settings.speed||55; defEl.value=p.settings.defdwell||45; startEl.value=p.settings.startdate||''; }
+  activeDay=Math.min(p.activeDay||0, TRIP.numDays-1);
+  $('#tripname').textContent='▸ '+(TRIP.name||'Trip')+' · '+TRIP.stops.length+' stops · '+TRIP.numDays+' days';
+  render();
 }
 
 // ---------- render ----------
@@ -398,6 +422,7 @@ function render(){
   v.querySelectorAll('.meal-row input').forEach(inp=>inp.addEventListener('input',e=>{
     if(!meals[activeDay]) meals[activeDay]={};
     meals[activeDay][e.target.dataset.meal]=e.target.value;
+    persist();
   }));
   // dwell: update value + recompute clocks in place (no rebuild → keeps focus)
   v.querySelectorAll('.dwell input').forEach(inp=>inp.addEventListener('input',e=>{
@@ -413,6 +438,7 @@ function render(){
   if(dd) dd.addEventListener('input',e=>{ dayDepart[activeDay]=e.target.value; updateClocks(); });
   const ud=$('#usedef');
   if(ud) ud.addEventListener('click',()=>{ delete dayDepart[activeDay]; render(); });
+  persist();
 }
 
 // recompute just the time labels for the active day, without rebuilding inputs
@@ -431,6 +457,7 @@ function updateClocks(){
   // update day-meta wheel/span
   const meta=document.querySelectorAll('.day-meta b');
   if(meta.length>=3){meta[1].textContent=(driving/60).toFixed(1)+' h';meta[2].textContent=((arriveFinal-depMins(activeDay))/60).toFixed(1)+' h';}
+  persist();
 }
 function updateTabMiles(){/* miles don't change on dwell; placeholder for future */}
 
@@ -593,12 +620,8 @@ function openProject(text){
   let p;
   try{ p=JSON.parse(text); }catch(e){ toast('Not a valid project file',true);return; }
   if(!p || p.format!=='rv-timing-project' || !p.trip){ toast('Not an RV timing project file',true);return; }
-  TRIP=p.trip;
-  dwell=p.dwell||{}; dayDepart=p.dayDepart||{}; meals=p.meals||{}; customNames=p.customNames||{};
-  if(p.settings){ depEl.value=p.settings.depart||'08:30'; spdEl.value=p.settings.speed||55; defEl.value=p.settings.defdwell||45; startEl.value=p.settings.startdate||''; }
-  activeDay=Math.min(p.activeDay||0, TRIP.numDays-1);
-  $('#tripname').textContent='▸ '+(TRIP.name||'Trip')+' · '+TRIP.stops.length+' stops · '+TRIP.numDays+' days';
-  render();
+  loadProject(p);
+  persist();
   toast('Project loaded');
 }
 $('#saveBtn').onclick=saveProject;
@@ -642,7 +665,18 @@ function closeModal(){
   openMode=false;
 }
 
-fetch('default-trip.json').then(r=>r.json()).then(loadTrip).catch(()=>loadTrip(FALLBACK_TRIP));
+(function init(){
+  let saved=null;
+  try{ saved=JSON.parse(localStorage.getItem(LS_KEY)); }catch(e){}
+  if(saved && saved.format==='rv-timing-project' && saved.trip){
+    loadProject(saved);
+    return;
+  }
+  fetch('default-trip.json').then(r=>r.json()).then(p=>{
+    if(p && p.format==='rv-timing-project' && p.trip){ loadProject(p); persist(); }
+    else loadTrip(p);
+  }).catch(()=>loadTrip(FALLBACK_TRIP));
+})();
 </script>
 </body>
 </html>
