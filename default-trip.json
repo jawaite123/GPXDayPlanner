@@ -1,0 +1,644 @@
+{
+  "format": "rv-timing-project",
+  "version": 1,
+  "trip": {
+    "name": "GPX-Export-45893440(1)",
+    "stops": [
+      {
+        "id": 0,
+        "day": 0,
+        "name": "Home",
+        "miles": 0,
+        "overnight": false
+      },
+      {
+        "id": 1,
+        "day": 0,
+        "name": "1 Night at Cracker Barrel",
+        "miles": 102.2,
+        "overnight": true
+      },
+      {
+        "id": 2,
+        "day": 1,
+        "name": "Harland Sanders Museum and Cafe",
+        "miles": 179.1,
+        "overnight": false
+      },
+      {
+        "id": 3,
+        "day": 1,
+        "name": "London, KY, United States",
+        "miles": 13,
+        "overnight": false
+      },
+      {
+        "id": 4,
+        "day": 1,
+        "name": "1 Night at Wise Bird Cider HH",
+        "miles": 77.3,
+        "overnight": true
+      },
+      {
+        "id": 5,
+        "day": 2,
+        "name": "Rabbit Hash General Store",
+        "miles": 82,
+        "overnight": false
+      },
+      {
+        "id": 6,
+        "day": 2,
+        "name": "Historic Loveland Castle and Museum",
+        "miles": 51.1,
+        "overnight": false
+      },
+      {
+        "id": 7,
+        "day": 2,
+        "name": "Irons Fruit Farm",
+        "miles": 12.4,
+        "overnight": false
+      },
+      {
+        "id": 8,
+        "day": 2,
+        "name": "1 Night at Drive in Theater HH",
+        "miles": 75.5,
+        "overnight": true
+      },
+      {
+        "id": 9,
+        "day": 3,
+        "name": "House from A Christmas Story",
+        "miles": 146.3,
+        "overnight": false
+      },
+      {
+        "id": 10,
+        "day": 3,
+        "name": "Terrapin Bakery",
+        "miles": 0.3,
+        "overnight": false
+      },
+      {
+        "id": 11,
+        "day": 3,
+        "name": "Sara's",
+        "miles": 99.9,
+        "overnight": false
+      },
+      {
+        "id": 12,
+        "day": 3,
+        "name": "Aunt Millie's Family Restaurant & Bakery",
+        "miles": 72.2,
+        "overnight": false
+      },
+      {
+        "id": 13,
+        "day": 3,
+        "name": "1 Night at Buffalo Riverworks",
+        "miles": 35.5,
+        "overnight": true
+      },
+      {
+        "id": 14,
+        "day": 4,
+        "name": "Wonder Coffeehouse",
+        "miles": 0.1,
+        "overnight": false
+      },
+      {
+        "id": 15,
+        "day": 4,
+        "name": "Border Crossing",
+        "miles": 6.6,
+        "overnight": false
+      },
+      {
+        "id": 16,
+        "day": 4,
+        "name": "Niagara-on-the-Lake",
+        "miles": 33,
+        "overnight": false
+      },
+      {
+        "id": 17,
+        "day": 4,
+        "name": "Walker's Country Market",
+        "miles": 2.4,
+        "overnight": false
+      },
+      {
+        "id": 18,
+        "day": 4,
+        "name": "Tiny Church",
+        "miles": 0.1,
+        "overnight": false
+      },
+      {
+        "id": 19,
+        "day": 4,
+        "name": "Park at Whirlpool Aero Car (Free)",
+        "miles": 9.9,
+        "overnight": false
+      },
+      {
+        "id": 20,
+        "day": 4,
+        "name": "Niagara Whirlpool",
+        "miles": 0.5,
+        "overnight": false
+      },
+      {
+        "id": 21,
+        "day": 4,
+        "name": "Niagara Glen Nature Areas",
+        "miles": 1.6,
+        "overnight": false
+      },
+      {
+        "id": 22,
+        "day": 4,
+        "name": "1 of 2 Nights at Riverside Park Motel & Campground",
+        "miles": 17.9,
+        "overnight": true
+      },
+      {
+        "id": 23,
+        "day": 5,
+        "name": "Niagara City Cruises 8:30-9:30 am",
+        "miles": 14.7,
+        "overnight": false
+      },
+      {
+        "id": 24,
+        "day": 5,
+        "name": "2 of 2 Nights at Riverside Park Motel & Campground",
+        "miles": 15.2,
+        "overnight": true
+      },
+      {
+        "id": 25,
+        "day": 6,
+        "name": "World's Largest Golf Bag",
+        "miles": 118.8,
+        "overnight": false
+      },
+      {
+        "id": 26,
+        "day": 6,
+        "name": "Elsie's Diner",
+        "miles": 64,
+        "overnight": false
+      },
+      {
+        "id": 27,
+        "day": 6,
+        "name": "Tiny Church",
+        "miles": 5,
+        "overnight": false
+      },
+      {
+        "id": 28,
+        "day": 6,
+        "name": "Farm Stand",
+        "miles": 1,
+        "overnight": false
+      },
+      {
+        "id": 29,
+        "day": 6,
+        "name": "Big Upholstered Chair",
+        "miles": 7.8,
+        "overnight": false
+      },
+      {
+        "id": 30,
+        "day": 6,
+        "name": "Wiarton Willie Statue",
+        "miles": 3.4,
+        "overnight": false
+      },
+      {
+        "id": 31,
+        "day": 6,
+        "name": "Big Bay General Store",
+        "miles": 11.9,
+        "overnight": false
+      },
+      {
+        "id": 32,
+        "day": 6,
+        "name": "Georgian Bay Country Market",
+        "miles": 14.4,
+        "overnight": false
+      },
+      {
+        "id": 33,
+        "day": 6,
+        "name": "Elliott's Garden Bakery & Greenhouse",
+        "miles": 0.2,
+        "overnight": false
+      },
+      {
+        "id": 34,
+        "day": 6,
+        "name": "Handicraft House Trading Post",
+        "miles": 3.2,
+        "overnight": false
+      },
+      {
+        "id": 35,
+        "day": 6,
+        "name": "Lion's Head Beach",
+        "miles": 15.6,
+        "overnight": false
+      },
+      {
+        "id": 36,
+        "day": 6,
+        "name": "1 Night Boondockers Welcome",
+        "miles": 14.7,
+        "overnight": true
+      },
+      {
+        "id": 37,
+        "day": 7,
+        "name": "The Grotto - Parking from 8am - 12pm (10am latest)",
+        "miles": 20.6,
+        "overnight": false
+      },
+      {
+        "id": 38,
+        "day": 7,
+        "name": "Tobermory Brewing Company and Grill",
+        "miles": 11.4,
+        "overnight": false
+      },
+      {
+        "id": 39,
+        "day": 7,
+        "name": "Chi-Cheemaun Ferry @ 5:45 PM",
+        "miles": 0.8,
+        "overnight": false
+      },
+      {
+        "id": 40,
+        "day": 7,
+        "name": "1 Night Kicking Mule Ranch HH",
+        "miles": 37.7,
+        "overnight": true
+      },
+      {
+        "id": 41,
+        "day": 8,
+        "name": "Manitowaning Lighthouse",
+        "miles": 9.4,
+        "overnight": false
+      },
+      {
+        "id": 42,
+        "day": 8,
+        "name": "Lake Huron fish And Chips",
+        "miles": 36.1,
+        "overnight": false
+      },
+      {
+        "id": 43,
+        "day": 8,
+        "name": "1 Night Meldrum Bay Campground",
+        "miles": 56.1,
+        "overnight": true
+      },
+      {
+        "id": 44,
+        "day": 9,
+        "name": "Manitoulin Chocolate Works",
+        "miles": 52.9,
+        "overnight": false
+      },
+      {
+        "id": 45,
+        "day": 9,
+        "name": "Boo Bah Loo Candy Corner",
+        "miles": 0.5,
+        "overnight": false
+      },
+      {
+        "id": 46,
+        "day": 9,
+        "name": "Bridal Veil Falls",
+        "miles": 0.1,
+        "overnight": false
+      },
+      {
+        "id": 47,
+        "day": 9,
+        "name": "Cup and Saucer Trail",
+        "miles": 13,
+        "overnight": false
+      },
+      {
+        "id": 48,
+        "day": 9,
+        "name": "3 Cows And A Cone",
+        "miles": 14.7,
+        "overnight": false
+      },
+      {
+        "id": 49,
+        "day": 9,
+        "name": "Little Current Swing Bridge",
+        "miles": 1.2,
+        "overnight": false
+      },
+      {
+        "id": 50,
+        "day": 9,
+        "name": "1 Night at Boondock spot",
+        "miles": 64.8,
+        "overnight": true
+      },
+      {
+        "id": 51,
+        "day": 10,
+        "name": "World's Largest Loonie",
+        "miles": 100.5,
+        "overnight": false
+      },
+      {
+        "id": 52,
+        "day": 10,
+        "name": "Soo Locks",
+        "miles": 20,
+        "overnight": false
+      },
+      {
+        "id": 53,
+        "day": 10,
+        "name": "1 Night Aune-Osborn Campground",
+        "miles": 2.4,
+        "overnight": true
+      },
+      {
+        "id": 54,
+        "day": 11,
+        "name": "The Wild Blueberry Breakfast & Bakery",
+        "miles": 54.6,
+        "overnight": false
+      },
+      {
+        "id": 55,
+        "day": 11,
+        "name": "Mackinaw Bakery & Coffeehouse",
+        "miles": 6.9,
+        "overnight": false
+      },
+      {
+        "id": 56,
+        "day": 11,
+        "name": "1 Night Big Buck Brewery HH",
+        "miles": 58.9,
+        "overnight": true
+      },
+      {
+        "id": 57,
+        "day": 12,
+        "name": "Dough Joe bakery shed",
+        "miles": 13.5,
+        "overnight": false
+      },
+      {
+        "id": 58,
+        "day": 12,
+        "name": "Sarah roadside bakery",
+        "miles": 8.6,
+        "overnight": false
+      },
+      {
+        "id": 59,
+        "day": 12,
+        "name": "The Farmers Creamery/The Farm Kitchen",
+        "miles": 28.7,
+        "overnight": false
+      },
+      {
+        "id": 60,
+        "day": 12,
+        "name": "The Bakery",
+        "miles": 3.5,
+        "overnight": false
+      },
+      {
+        "id": 61,
+        "day": 12,
+        "name": "Dairy Ace",
+        "miles": 4.6,
+        "overnight": false
+      },
+      {
+        "id": 62,
+        "day": 12,
+        "name": "Cops & Doughnuts",
+        "miles": 57.8,
+        "overnight": false
+      },
+      {
+        "id": 63,
+        "day": 12,
+        "name": "1 Night Austin Brothers Beer Co HH",
+        "miles": 3.4,
+        "overnight": true
+      },
+      {
+        "id": 64,
+        "day": 13,
+        "name": "1940s Paul Bunyan and Babe",
+        "miles": 13.7,
+        "overnight": false
+      },
+      {
+        "id": 65,
+        "day": 13,
+        "name": "Ed's Antiques and Collectibles",
+        "miles": 19.9,
+        "overnight": false
+      },
+      {
+        "id": 66,
+        "day": 13,
+        "name": "Kenneth Roy Antiques",
+        "miles": 0.7,
+        "overnight": false
+      },
+      {
+        "id": 67,
+        "day": 13,
+        "name": "Parkside Dairy",
+        "miles": 16.7,
+        "overnight": false
+      },
+      {
+        "id": 68,
+        "day": 13,
+        "name": "SunnySide Coffee",
+        "miles": 16,
+        "overnight": false
+      },
+      {
+        "id": 69,
+        "day": 13,
+        "name": "Cozy Cup Coffee Company",
+        "miles": 1.5,
+        "overnight": false
+      },
+      {
+        "id": 70,
+        "day": 13,
+        "name": "Wilson's Cheese Shoppe",
+        "miles": 45.6,
+        "overnight": false
+      },
+      {
+        "id": 71,
+        "day": 13,
+        "name": "Barney’s bakery?",
+        "miles": 22.1,
+        "overnight": false
+      },
+      {
+        "id": 72,
+        "day": 13,
+        "name": "Grand Traverse Pie Company",
+        "miles": 21.9,
+        "overnight": false
+      },
+      {
+        "id": 73,
+        "day": 13,
+        "name": "Frankenmuth, MI",
+        "miles": 44,
+        "overnight": false
+      },
+      {
+        "id": 74,
+        "day": 13,
+        "name": "1 Night at Tenacity Brewing HH",
+        "miles": 28.7,
+        "overnight": true
+      },
+      {
+        "id": 75,
+        "day": 14,
+        "name": "Cook's Farm Dairy",
+        "miles": 26.5,
+        "overnight": false
+      },
+      {
+        "id": 76,
+        "day": 14,
+        "name": "Human Fingers in a Jar",
+        "miles": 128.5,
+        "overnight": false
+      },
+      {
+        "id": 77,
+        "day": 14,
+        "name": "Snook's Dream Cars",
+        "miles": 0.6,
+        "overnight": false
+      },
+      {
+        "id": 78,
+        "day": 14,
+        "name": "Thomas Danbo Trolls",
+        "miles": 122.8,
+        "overnight": false
+      },
+      {
+        "id": 79,
+        "day": 14,
+        "name": "1 Night Valley Vineyards HH",
+        "miles": 49.1,
+        "overnight": true
+      },
+      {
+        "id": 80,
+        "day": 15,
+        "name": "Cream + Sugar Coffeehouse",
+        "miles": 26.5,
+        "overnight": false
+      },
+      {
+        "id": 81,
+        "day": 15,
+        "name": "1 of 2 Nights Two Rivers Landing RV Resort",
+        "miles": 277.1,
+        "overnight": true
+      },
+      {
+        "id": 82,
+        "day": 16,
+        "name": "Fireworks - Lake Douglas?",
+        "miles": 16,
+        "overnight": false
+      },
+      {
+        "id": 83,
+        "day": 16,
+        "name": "Fireworks - Patriot Park",
+        "miles": 28.1,
+        "overnight": false
+      },
+      {
+        "id": 84,
+        "day": 16,
+        "name": "2 of 2 Nights Two Rivers Landing RV Resort",
+        "miles": 12.5,
+        "overnight": true
+      },
+      {
+        "id": 85,
+        "day": 17,
+        "name": "Richy Kreme Donuts",
+        "miles": 27.2,
+        "overnight": false
+      },
+      {
+        "id": 86,
+        "day": 17,
+        "name": "Maryville, TN, United States",
+        "miles": 3.6,
+        "overnight": false
+      },
+      {
+        "id": 87,
+        "day": 17,
+        "name": "Chatsworth, GA, United States",
+        "miles": 89.1,
+        "overnight": false
+      },
+      {
+        "id": 88,
+        "day": 17,
+        "name": "Home",
+        "miles": 68.7,
+        "overnight": false
+      }
+    ],
+    "numDays": 18
+  },
+  "settings": {
+    "depart": "08:30",
+    "speed": 55,
+    "defdwell": 45,
+    "startdate": "2026-06-18"
+  },
+  "dwell": {},
+  "dayDepart": {},
+  "meals": {},
+  "customNames": {},
+  "activeDay": 0
+}
