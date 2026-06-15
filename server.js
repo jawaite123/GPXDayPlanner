@@ -3,8 +3,17 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const DEFAULT_TRIP_PATH = path.join(__dirname, 'default-trip.json');
+const PORT = process.env.PORT || 8080;
+// On Fly.io a persistent volume is mounted at /data (see fly.toml). Falls back
+// to the repo's checked-in copy for local/static-only setups.
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DEFAULT_TRIP_PATH = path.join(DATA_DIR, 'default-trip.json');
+const SEED_TRIP_PATH = path.join(__dirname, 'default-trip.json');
+
+// Seed the volume on first boot if it doesn't have a default trip yet.
+if (DEFAULT_TRIP_PATH !== SEED_TRIP_PATH && !fs.existsSync(DEFAULT_TRIP_PATH)) {
+  try { fs.copyFileSync(SEED_TRIP_PATH, DEFAULT_TRIP_PATH); } catch (e) {}
+}
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(__dirname));
